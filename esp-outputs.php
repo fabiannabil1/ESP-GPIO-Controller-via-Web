@@ -139,6 +139,10 @@ if ($result2) {
             font-size: 0.8em;
             margin-right: 5px;
         }
+        .custom-switch-lg {
+            transform: scale(1.5); /* Ubah 1.5 ke nilai yang diinginkan */
+            transform-origin: right; /* Opsional: agar skala mulai dari sisi kiri */
+        }
         
     </style>
 </head>
