@@ -36,9 +36,9 @@ if ($result) {
                         </div>
                     </div>
 
-                    <div class="mt-0">
+                    <div class="mt-0 ">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div class="d-flex gap-2">';
+                            <div class="d-flex flex-auto gap-2">';
 
                     if ($row["type"] == 'output') {
                         $html_buttons .= '
@@ -91,9 +91,11 @@ if ($result2) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoT GPIO Controller</title>
+    <title>GPIO Controller by Fabian</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="icon.png">
+
     <style>
         :root {
             --primary: #4a76a8;
@@ -150,7 +152,7 @@ if ($result2) {
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-microchip"></i> IoT Controller
+                <i class="fas fa-microchip"></i> IoT Controller GPIO Controller by Fabian
             </a>
         </div>
     </nav>
