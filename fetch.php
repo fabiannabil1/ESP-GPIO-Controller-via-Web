@@ -1,18 +1,19 @@
 <?php
-include_once('esp-database.php');
+include_once 'esp-database.php';
+
+header('Content-Type: application/json');
 
 $result = getAllOutputs();
-$data = [];
+$outputs = array();
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        $data[] = [
-            'id' => $row["id"],
-            'state' => $row["state"]
-        ];
+        $outputs[] = array(
+            'id' => (int)$row['id'],
+            'state' => (int)$row['state']
+        );
     }
 }
 
-header('Content-Type: application/json');
-echo json_encode($data);
+echo json_encode($outputs);
 ?>

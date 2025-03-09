@@ -13,59 +13,51 @@ if ($result) {
         $button_checked = isset($row["state"]) && $row["state"] == "1" ? "checked" : "";
         $color = isset($row["state"]) && $row["state"] == "1" ? "success" : "danger";
         $status_text = isset($row["state"]) && $row["state"] == "1" ? 'ON' : 'OFF';
-        $last_request = $row["last_request"] ?? '';
-        $last_active = (strtotime($last_request) > time() - 30) ? "active" : "inactive";
 
         $html_buttons .= '
         <div class="col-md-6 col-lg-4 mb-4">
             <div class="card h-100">
                 <div class="card-body d-flex flex-column">
                     <div class="d-flex justify-content-between mb-3">
-                        <h5 class="card-title text-truncate mb-0">'.sanitize($row["name"]).'</h5>
+                        <h5 class="card-title text-truncate mb-0">' . sanitize($row["name"]) . '</h5>
                         <button type="button" 
                                 class="btn btn-sm btn-outline-danger ms-2" 
-                                onclick="deleteOutput('.$row["id"].')"
+                                onclick="deleteOutput(' . $row["id"] . ')"
                                 title="Hapus">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                     
                    <div class="mb-4">
-                    <div class="d-flex flex-column gap-2 mb-2">
-                        <span class="badge badge-primary mt-2">Board '.sanitize($row["board"]).'</span>
-                        <span class="badge badge-info mt-2">GPIO '.sanitize($row["gpio"]).'</span>
-                        <span class="badge badge-secondary mt-2">'.strtoupper($row["type"]).'</span>
+                        <div class="d-flex flex-column gap-2 mb-2">
+                            <span class="badge badge-primary mt-2">Board ' . sanitize($row["board"]) . '</span>
+                            <span class="badge badge-info mt-2">GPIO ' . sanitize($row["gpio"]) . '</span>
+                            <span class="badge badge-secondary mt-2">' . strtoupper($row["type"]) . '</span>
+                        </div>
                     </div>
-                </div>
 
-
-                    <div class="mt-auto">
+                    <div class="mt-0">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div class="d-flex align-items-center gap-2">';
+                            <div class="d-flex gap-2">';
 
-        if($row["type"] == 'output') {
-            $html_buttons .= '
+                    if ($row["type"] == 'output') {
+                        $html_buttons .= '
                                 <div class="custom-control custom-switch custom-switch-lg">
                                     <input type="checkbox" class="custom-control-input" 
-                                        id="switch-'.$row["id"].'" 
-                                        onchange="updateOutput('.$row["id"].')" 
-                                        '.$button_checked.'>
-                                    <label class="custom-control-label" for="switch-'.$row["id"].'"></label>
+                                        id="switch-' . $row["id"] . '" 
+                                        onchange="updateOutput(' . $row["id"] . ')" 
+                                        ' . $button_checked . '>
+                                    <label class="custom-control-label" for="switch-' . $row["id"] . '"></label>
                                 </div>';
-        }
+                    }
 
-        $html_buttons .= '
+                    $html_buttons .= '
                                 <div class="status-indicator">
-                                    <span class="badge badge-'.$color.' status-badge">
-                                        <i class="fas fa-circle me-1 '.($row["state"] ? 'text-success' : 'text-danger').'"></i>
-                                        <span class="status-text">'.$status_text.'</span>
+                                    <span id="status-badge-' . $row["id"] . '" class="badge badge-' . $color . ' status-badge">
+                                        <i id="status-icon-' . $row["id"] . '" class="fas fa-circle me-1 ' . ($row["state"] ? 'text-success' : 'text-danger') . '"></i>
+                                        <span id="status-text-' . $row["id"] . '" class="status-text">' . $status_text . '</span>
                                     </span>
                                 </div>
-                            </div>
-                            
-                            <div class="text-muted small">
-                                <i class="fas fa-clock me-1"></i> 
-                                '.date('H:i:s', strtotime($last_request)).'
                             </div>
                         </div>
                     </div>
@@ -74,6 +66,7 @@ if ($result) {
         </div>';
     }
 }
+
 
 $result2 = getAllBoards();
 $html_boards = '';
@@ -316,37 +309,43 @@ if ($result2) {
         }
 
         // Auto-refresh setiap 1 detik
+        function updateStatusElements(id, state) {
+            const badge = $(`#status-badge-${id}`);
+            const icon = $(`#status-icon-${id}`);
+            const text = $(`#status-text-${id}`);
+            
+            // Update classes
+            badge.removeClass('badge-success badge-danger')
+                .addClass(state ? 'badge-success' : 'badge-danger');
+            
+            icon.removeClass('text-success text-danger')
+                .addClass(state ? 'text-success' : 'text-danger');
+            
+            // Update text
+            text.text(state ? 'ON' : 'OFF');
+        }
+
         setInterval(function() {
-            $.getJSON('fetch.php', function(data) {
-                data.forEach(function(output) {
-                    // Update status switch
-                    const checkbox = $(`#switch-${output.id}`);
-                    const currentState = checkbox.prop('checked');
-                    if (currentState !== (output.state == 1)) {
-                        checkbox.prop('checked', output.state == 1);
-                    }
-                    
-                    // Update badge status dan teks
-                    const cardBody = checkbox.closest('.card-body');
-                    const badge = cardBody.find('.status-badge');
-                    const statusIcon = badge.find('i');
-                    const statusText = badge.find('.status-text');
-                    
-                    if (output.state == 1) {
-                        badge.removeClass('badge-danger').addClass('badge-success');
-                        statusIcon.removeClass('text-danger').addClass('text-success');
-                        statusText.text('ON');
-                    } else {
-                        badge.removeClass('badge-success').addClass('badge-danger');
-                        statusIcon.removeClass('text-success').addClass('text-danger');
-                        statusText.text('OFF');
-                    }
-                    
-                    // Update waktu terakhir aktif
-                    const timeDisplay = cardBody.find('.text-muted small');
-                    // Misalnya, output.last_request berformat waktu atau bisa diolah kembali jika perlu
-                    timeDisplay.html('<i class="fas fa-clock me-1"></i> ' + output.last_request);
-                });
+            $.ajax({
+                url: 'fetch.php',
+                dataType: 'json',
+                success: function(data) {
+                    data.forEach(function(output) {
+                        const checkbox = $(`#switch-${output.id}`);
+                        const currentState = checkbox.prop('checked');
+                        
+                        // Update checkbox jika berbeda
+                        if (currentState !== (output.state === 1)) {
+                            checkbox.prop('checked', output.state === 1);
+                        }
+                        
+                        // Update status elements
+                        updateStatusElements(output.id, output.state);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching states:', error);
+                }
             });
         }, 1000);
 
