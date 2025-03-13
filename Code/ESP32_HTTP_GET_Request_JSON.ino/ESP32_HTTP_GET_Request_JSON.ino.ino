@@ -4,8 +4,8 @@
 
 #define MAX_GPIO 40  // Misalnya, 40 GPIO yang akan diproses
 
-const char* url = "url";
-const char* ssid = "yout_ssid";
+const char* url = "10.132.0.213/Contactor%20Indikator";
+const char* ssid = "UNEJ-ACCESS";
 const char* password = "your_pass";
 
 // Gunakan objek String untuk konkatenasi URL
@@ -27,7 +27,7 @@ bool pinIsInput(int gpio) {
 void setup() {
   Serial.begin(115200);
   
-  WiFi.begin(ssid, password);
+  WiFi.begin(ssid);
   Serial.println("Connecting");
   while (WiFi.status() != WL_CONNECTED) { 
     delay(500);
